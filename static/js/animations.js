@@ -17,6 +17,18 @@ const AnimationManager = (() => {
             tasks: () => {
                 animateElements('#tasksTab .task-item', 'fadeInRight', 100);
                 animateElements('#tasksTab .daily-challenge', 'pulse');
+                // Animate social mission cards with a staggered entry
+                animateElements('#tasksTab .social-card', 'fadeInUp', 150);
+                // Animate social progress bar
+                animateElements('#tasksTab .social-progress', 'fadeInRight');
+                // Update social progress display
+                const progressFill = document.getElementById('socialProgressFill');
+                if (progressFill) {
+                    const currentWidth = parseFloat(progressFill.style.width);
+                    progressFill.style.animation = 'none';
+                    progressFill.offsetHeight; // Trigger reflow
+                    progressFill.style.animation = 'pulse 2s';
+                }
             },
             withdraw: () => {
                 animateElements('#withdrawTab .glass-card', 'fadeInUp', 150);
