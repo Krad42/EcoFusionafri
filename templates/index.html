@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoFusion - Plateforme Éco-Responsable</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌱</text></svg>">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Preloader -->
+    <div id="preloader">
+        <div class="loader-container">
+            <object data="{{ url_for('static', filename='svg/loading.svg') }}" type="image/svg+xml" class="loader-svg"></object>
+            <p>Chargement de votre expérience écologique...</p>
+        </div>
+    </div>
+
+    <!-- Sound toggle -->
+    <div class="sound-toggle">
+        <button id="soundToggle" aria-label="Toggle sound effects">
+            <i class="fas fa-volume-up" id="soundIcon"></i>
+        </button>
+    </div>
+
+    <!-- Main content -->
+    <div class="app-container">
+        <!-- Navigation tabs -->
+        <nav class="nav-tabs">
+            <button class="nav-btn active" data-tab="finance">
+                <i class="fas fa-coins"></i> 
+                <span>Finance</span>
+            </button>
+            <button class="nav-btn" data-tab="game">
+                <i class="fas fa-leaf"></i>
+                <span>Jeu Éco</span>
+            </button>
+            <button class="nav-btn" data-tab="tasks">
+                <i class="fas fa-tasks"></i> 
+                <span>Missions</span>
+            </button>
+            <button class="nav-btn" data-tab="withdraw">
+                <i class="fas fa-hand-holding-usd"></i>
+                <span>Retrait</span>
+            </button>
+        </nav>
+
+        <!-- User info panel -->
+        <div class="user-info">
+            <div class="balance-display">
+                <div class="eco-points">
+                    <i class="fas fa-leaf"></i> <span id="ecoPoints">0</span>
+                </div>
+            </div>
+            <div class="energy-container">
+                <div class="energy-label">Énergie: <span id="energy">100</span>/100</div>
+                <div id="energyBar" class="energy-bar">
+                    <div id="energyProgress" class="energy-progress" style="width: 100%"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content containers -->
+        <div class="tab-container">
+            <div id="financeTab" class="tab-content active">
+                {% include 'partials/finance.html' %}
+            </div>
+            
+            <div id="gameTab" class="tab-content">
+                {% include 'partials/game.html' %}
+            </div>
+            
+            <div id="tasksTab" class="tab-content">
+                {% include 'partials/tasks.html' %}
+            </div>
+            
+            <div id="withdrawTab" class="tab-content">
+                {% include 'partials/withdraw.html' %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="{{ url_for('static', filename='js/audio.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/animations.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/game.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

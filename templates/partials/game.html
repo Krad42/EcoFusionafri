@@ -1,0 +1,47 @@
+<div class="game-container">
+    <div class="section-header">
+        <h2><i class="fas fa-leaf"></i> Jeu Écologique</h2>
+    </div>
+    
+    <div class="game-area glass-card">
+        <div class="planet-container">
+            <object data="{{ url_for('static', filename='svg/plant.svg') }}" type="image/svg+xml" id="plantObject" class="plant-svg"></object>
+            <div class="tap-indicator" id="tapIndicator">Tap!</div>
+        </div>
+        
+        <div class="action-buttons">
+            <button id="mainButton" class="eco-action-btn">
+                <i class="fas fa-hand-pointer"></i> Taper pour planter
+            </button>
+        </div>
+        
+        <div class="game-stats">
+            <div class="game-stat">
+                <i class="fas fa-tree"></i>
+                <span>Arbres plantés: <span id="treesPlanted">0</span></span>
+            </div>
+            <div class="game-stat">
+                <i class="fas fa-tachometer-alt"></i>
+                <span>Multiplicateur: x<span id="currentMultiplier">1</span></span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="achievements-section glass-card">
+        <h3><i class="fas fa-trophy"></i> Réussites</h3>
+        <div class="achievements-list" id="achievementsList">
+            <div class="achievement locked">
+                <i class="fas fa-seedling"></i>
+                <span>Premier Pas: Plante ton premier arbre</span>
+            </div>
+            <div class="achievement locked">
+                <i class="fas fa-forest"></i>
+                <span>Forestier: Plante 10 arbres</span>
+            </div>
+            <div class="achievement locked">
+                <i class="fas fa-globe-americas"></i>
+                <span>Écologiste: Plante 50 arbres</span>
+            </div>
+        </div>
+    </div>
+</div>
