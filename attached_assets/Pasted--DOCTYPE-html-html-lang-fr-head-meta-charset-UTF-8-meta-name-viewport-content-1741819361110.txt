@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoFusion - Plateforme Éco-Responsable</title>
+    <style>
+        :root {
+            --primary-color: #27ae60;
+            --secondary-color: #2c3e50;
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --premium-color: #f1c40f;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            color: white;
+        }
+
+        .container {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 1rem auto;
+            max-width: 800px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .nav-btn {
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn.active {
+            background: var(--primary-color);
+            transform: scale(1.05);
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Animations spécifiques */
+        @keyframes coinBounce {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        .upgrade-card {
+            transition: all 0.3s ease;
+            transform-origin: center;
+        }
+
+        .upgrade-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .payment-option {
+            transition: all 0.3s ease;
+        }
+
+        .payment-option.selected {
+            animation: selectPulse 0.5s ease;
+        }
+
+        @keyframes selectPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        #energyProgress {
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .coin-animation {
+            animation: coinFloat 1s ease-out forwards;
+            position: absolute;
+            pointer-events: none;
+            font-size: 1.5em;
+            color: var(--premium-color);
+        }
+
+        @keyframes coinFloat {
+            0% { opacity: 1; transform: translateY(0) scale(1); }
+            100% { opacity: 0; transform: translateY(-100px) scale(0.5); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="nav-tabs">
+    <button class="nav-btn active" onclick="showTab('finance')">💰 Finance</button>
+    <button class="nav-btn" onclick="showTab('game')">🎮 Jeu Éco</button>
+    <button class="nav-btn" onclick="showTab('tasks')">📱 Missions</button>
+    <button class="nav-btn" onclick="showTab('withdraw')">💸 Retrait</button>
+</div>
+
+<!-- Sections du contenu -->
+<div id="financeTab" class="tab-content">
+    <!-- Contenu finance existant -->
+</div>
+
+<div id="gameTab" class="tab-content" style="display: none;">
+    <!-- Contenu jeu existant avec animation de clic -->
+    <button id="mainButton" onclick="tapHandler()">
+        🌍 Taper pour planter
+    </button>
+</div>
+
+<div id="tasksTab" class="tab-content" style="display: none;">
+    <!-- Contenu missions existant -->
+</div>
+
+<div id="withdrawTab" class="tab-content" style="display: none;">
+    <!-- Contenu retrait existant -->
+</div>
+
+<script>
+// Configuration commune
+const APP_CONFIG = {
+    DEMO_MODE: true,
+    WITHDRAWAL_DATE: new Date('2025-03-30'),
+    MAX_SAVINGS: 1000000,
+    GAME_CONFIG: {
+        baseReward: 1,
+        energyCost: 5,
+        energyRegenRate: 2,
+        maxEnergy: 100,
+        upgrades: {
+            autoClicker: { cost: 50, interval: 1000 },
+            multiplier: { cost: 100, value: 2 }
+        }
+    }
+};
+
+// État global
+let user = {
+    email: '',
+    balance: 0,
+    energy: 100,
+    upgrades: {},
+    achievements: [],
+    multipliers: 1
+};
+
+// Animation de clic
+function tapHandler() {
+    if(user.energy >= APP_CONFIG.GAME_CONFIG.energyCost) {
+        // Animation
+        const btn = document.getElementById('mainButton');
+        btn.style.animation = 'coinBounce 0.3s';
+        setTimeout(() => btn.style.animation = '', 300);
+
+        // Créer une pièce animée
+        const coin = document.createElement('div');
+        coin.className = 'coin-animation';
+        coin.textContent = '+1';
+        btn.parentElement.appendChild(coin);
+        
+        // Mettre à jour l'état
+        user.balance += APP_CONFIG.GAME_CONFIG.baseReward * user.multipliers;
+        user.energy -= APP_CONFIG.GAME_CONFIG.energyCost;
+        
+        updateGameUI();
+        setTimeout(() => coin.remove(), 1000);
+    }
+}
+
+// Gestion des onglets
+function showTab(tabName) {
+    // Animation de transition
+    document.querySelectorAll('.tab-content').forEach(tab => {
+        if(tab.style.display === 'block') {
+            tab.style.animation = 'fadeOut 0.3s ease';
+            setTimeout(() => tab.style.display = 'none', 250);
+        }
+    });
+
+    setTimeout(() => {
+        const activeTab = document.getElementById(`${tabName}Tab`);
+        activeTab.style.display = 'block';
+        activeTab.style.animation = 'fadeIn 0.3s ease';
+    }, 250);
+
+    // Mise à jour navigation
+    document.querySelectorAll('.nav-btn').forEach(btn => 
+        btn.classList.remove('active'));
+    document.querySelector(`[onclick="showTab('${tabName}')"]`)
+        .classList.add('active');
+}
+
+// Mise à jour UI
+function updateGameUI() {
+    // Mettre à jour l'affichage
+    document.getElementById('ecoPoints').textContent = user.balance;
+    document.getElementById('energy').textContent = user.energy;
+    document.getElementById('energyProgress').style.width = user.energy + '%';
+
+    // Animation barre d'énergie
+    if(user.energy < 20) {
+        document.getElementById('energyBar').style.animation = 'lowEnergyPulse 1s infinite';
+    } else {
+        document.getElementById('energyBar').style.animation = '';
+    }
+}
+
+// Initialisation
+window.onload = () => {
+    const savedUser = localStorage.getItem('africashUser');
+    if(savedUser) user = JSON.parse(savedUser);
+    updateGameUI();
+    
+    // Régénération d'énergie
+    setInterval(() => {
+        if(user.energy < 100) {
+            user.energy = Math.min(user.energy + 
+                APP_CONFIG.GAME_CONFIG.energyRegenRate, 100);
+            updateGameUI();
+        }
+    }, 1000);
+};
+
+// Sauvegarde automatique
+setInterval(() => {
+    localStorage.setItem('africashUser', JSON.stringify(user));
+}, 5000);
+</script>
+
+</body>
+</html>
