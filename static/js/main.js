@@ -30,6 +30,10 @@ document.addEventListener('DOMContentLoaded', () => {
         tasks: {
             completed: []
         },
+        socialMissions: {
+            completed: [],
+            totalPoints: 0
+        },
         sound: true,
         haptic: true
     };
@@ -296,6 +300,165 @@ document.addEventListener('DOMContentLoaded', () => {
             saveUserData();
         });
     };
+    
+    // Initialize social missions
+    const initializeSocialMissions = () => {
+        // Initialize social data if not exists
+        if (!user.socialMissions) {
+            user.socialMissions = {
+                completed: [],
+                totalPoints: 0
+            };
+            saveUserData();
+        }
+        
+        // Get all social buttons
+        const socialButtons = document.querySelectorAll('.social-btn');
+        
+        // Mark already completed social missions
+        socialButtons.forEach(button => {
+            const socialId = button.getAttribute('data-social-id');
+            
+            if (user.socialMissions.completed.includes(socialId)) {
+                button.innerHTML = '<i class="fas fa-check"></i> Complété';
+                button.classList.add('completed');
+                button.closest('.social-card').classList.add('completed');
+            }
+            
+            // Add click handlers to social buttons
+            button.addEventListener('click', () => {
+                const socialCard = button.closest('.social-card');
+                const url = socialCard.getAttribute('data-url');
+                const points = parseInt(socialCard.getAttribute('data-points'));
+                
+                // Only process if not already completed
+                if (!user.socialMissions.completed.includes(socialId)) {
+                    // Open the social media link in a new tab
+                    window.open(url, '_blank');
+                    
+                    // Show confirmation dialog
+                    setTimeout(() => {
+                        const confirmed = confirm("Avez-vous suivi cette chaîne sociale? Si oui, vous recevrez les points de récompense.");
+                        
+                        if (confirmed) {
+                            // Add to completed missions
+                            user.socialMissions.completed.push(socialId);
+                            
+                            // Add points to user balance
+                            user.balance += points;
+                            user.socialMissions.totalPoints += points;
+                            
+                            // Play achievement sound
+                            AudioManager.play('achievement');
+                            
+                            // Update UI with animations
+                            button.innerHTML = '<i class="fas fa-check"></i> Complété';
+                            button.classList.add('completed');
+                            socialCard.classList.add('completed');
+                            
+                            // Show points animation
+                            AnimationManager.showReward(button, points);
+                            
+                            // Update social progress
+                            updateSocialProgress();
+                            
+                            // Update general UI
+                            updateUI();
+                            
+                            // Save user data
+                            saveUserData();
+                            
+                            // Check if all social missions are completed
+                            checkAllSocialMissionsCompleted();
+                        }
+                    }, 1000);
+                }
+            });
+        });
+        
+        // Update social progress on init
+        updateSocialProgress();
+    };
+    
+    // Update the social progress display
+    const updateSocialProgress = () => {
+        const socialPoints = document.getElementById('socialPoints');
+        const socialProgressFill = document.getElementById('socialProgressFill');
+        
+        if (socialPoints && socialProgressFill) {
+            const totalPoints = user.socialMissions?.totalPoints || 0;
+            const maxPoints = 100; // Total points possible from social missions
+            const percentage = Math.min(100, (totalPoints / maxPoints) * 100);
+            
+            socialPoints.textContent = totalPoints;
+            socialProgressFill.style.width = `${percentage}%`;
+            
+            // Add animation for progress updates
+            socialProgressFill.style.animation = 'none';
+            socialProgressFill.offsetHeight; // Trigger reflow
+            socialProgressFill.style.animation = 'pulse 2s';
+        }
+    };
+    
+    // Check if all social missions are completed
+    const checkAllSocialMissionsCompleted = () => {
+        const socialButtons = document.querySelectorAll('.social-btn');
+        const totalSocialMissions = socialButtons.length;
+        
+        if (user.socialMissions?.completed.length === totalSocialMissions) {
+            // Achievement for completing all social missions
+            if (!user.achievements.includes('social_master')) {
+                unlockAchievement('social_master', 'Maître des Réseaux');
+                
+                // Create achievement notification
+                const notification = document.createElement('div');
+                notification.className = 'social-achievement-notification';
+                notification.innerHTML = `
+                    <i class="fas fa-award"></i>
+                    <div>
+                        <h4>Mission accomplie !</h4>
+                        <p>Vous avez complété toutes les missions sociales</p>
+                    </div>
+                `;
+                
+                // Style the notification
+                Object.assign(notification.style, {
+                    position: 'fixed',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    backgroundColor: 'rgba(46, 204, 113, 0.9)',
+                    color: 'white',
+                    padding: '20px',
+                    borderRadius: '12px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '15px',
+                    zIndex: '1000',
+                    boxShadow: '0 8px 30px rgba(0, 0, 0, 0.3)',
+                    animation: 'fadeIn 0.5s, pulse 2s infinite'
+                });
+                
+                // Style the icon
+                const icon = notification.querySelector('i');
+                Object.assign(icon.style, {
+                    fontSize: '40px',
+                    color: 'var(--premium-color)'
+                });
+                
+                // Add to DOM
+                document.body.appendChild(notification);
+                
+                // Hide after delay
+                setTimeout(() => {
+                    notification.style.animation = 'fadeOut 0.5s forwards';
+                    setTimeout(() => {
+                        notification.remove();
+                    }, 500);
+                }, 5000);
+            }
+        }
+    };
 
     // Check for achievements
     const checkAchievements = () => {
@@ -390,6 +553,19 @@ document.addEventListener('DOMContentLoaded', () => {
             const impact = (user.treesPlanted * 0.5).toFixed(1);
             carbonImpact.textContent = impact;
         }
+        
+        // Update social missions progress
+        const socialPoints = document.getElementById('socialPoints');
+        const socialProgressFill = document.getElementById('socialProgressFill');
+        
+        if (socialPoints && socialProgressFill) {
+            const totalPoints = user.socialMissions?.totalPoints || 0;
+            const maxPoints = 100; // Total points possible from social missions
+            const percentage = Math.min(100, (totalPoints / maxPoints) * 100);
+            
+            socialPoints.textContent = totalPoints;
+            socialProgressFill.style.width = `${percentage}%`;
+        }
     };
 
     // Energy regeneration system
@@ -432,6 +608,7 @@ document.addEventListener('DOMContentLoaded', () => {
         initializeTasks();
         initializeUpgrades();
         initializeSoundToggle();
+        initializeSocialMissions();
         
         // Start energy regeneration
         startEnergyRegen();
